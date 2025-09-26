@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月光石传说 - 寻宝游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a8dadc;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .steps-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .steps-title {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: #ff9a9e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .steps-title i {
+            font-size: 2rem;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step.active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: #ff9a9e;
+        }
+
+        .step-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            padding-left: 35px;
+            position: relative;
+        }
+
+        .step-content::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: #ff9a9e;
+            border-radius: 50%;
+        }
+
+        .progress-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            color: #a8dadc;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #a8dadc;
+        }
+
+        .treasure-box-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .treasure-box-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ff9a9e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .treasure-box {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(145deg, #1a2a6c, #2c3e50);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .treasure-box.open {
+            transform: scale(1.05);
+            box-shadow: 0 20px 45px rgba(255, 154, 158, 0.6);
+        }
+
+        .treasure-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="%23ff9a9e" stroke-width="2" d="M20,20 Q50,5 80,20 T140,20"/></svg>') no-repeat center;
+            opacity: 0.3;
+        }
+
+        .treasure-box::after {
+            content: "";
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 50%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="%23ff9a9e" stroke-width="2" d="M20,20 Q50,5 80,20 T140,20"/></svg>') no-repeat center;
+            opacity: 0.2;
+        }
+
+        .treasure-content {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+            transition: all 0.5s ease;
+            min-height: 150px;
+        }
+
+        .treasure-content.show {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .treasure-content h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #ff9a9e;
+        }
+
+        .treasure-content p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: #2c3e50;
+            border: none;
+            padding: 14px 35px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to right, #ff8a8a, #f9c1c1);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #a8dadc;
+            color: #2c3e50;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .instructions h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff9a9e;
+            font-size: 1.8rem;
+        }
+
+        .instructions p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        .instructions ul {
+            padding-left: 25px;
+            margin: 15px 0;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .instructions li::marker {
+            color: #ff9a9e;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #a8dadc;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 解谜模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #1a2a6c;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 500px;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 30px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #ff9a9e;
+            transition: transform 0.2s;
+        }
+
+        .close:hover {
+            transform: rotate(90deg);
+        }
+
+        .riddle-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .riddle-option {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: #2c3e50;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .riddle-option:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(to right, #ff8a8a, #f9c1c1);
+        }
+
+        #riddleResult {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            height: 25px;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 154, 158, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 154, 158, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 154, 158, 0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .step-title {
+                font-size: 1.2rem;
+            }
+
+            .treasure-box {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>月光石传说</h1>
+            <p class="subtitle">踏上寻找传说中的"月光石"的冒险之旅，解开古老谜题，穿越神秘森林，最终揭开宝藏的面纱！</p>
+        </header>
+
+        <div class="game-container">
+            <div class="steps-container">
+                <h2 class="steps-title"><i>🔍</i> 寻宝步骤</h2>
+
+                <div class="step" id="step1">
+                    <div class="step-title"><i>📚</i> 初始线索</div>
+                    <div class="step-content" id="step1-content"></div>
+                </div>
+
+                <div class="step" id="step2">
+                    <div class="step-title"><i>🧩</i> 解开谜题</div>
+                    <div class="step-content" id="step2-content"></div>
+                </div>
+
+                <div class="step" id="step3">
+                    <div class="step-title"><i>📜</i> 解码古文</div>
+                    <div class="step-content" id="step3-content"></div>
+                </div>
+
+                <div class="step" id="step4">
+                    <div class="step-title"><i>🌳</i> 穿越森林</div>
+                    <div class="step-content" id="step4-content"></div>
+                </div>
+
+                <div class="step" id="step5">
+                    <div class="step-title"><i>⛩️</i> 寻找神庙</div>
+                    <div class="step-content" id="step5-content"></div>
+                </div>
+
+                <div class="step" id="step6">
+                    <div class="step-title"><i>💎</i> 宝藏开启</div>
+                    <div class="step-content" id="step6-content"></div>
+                </div>
+
+                <div class="progress-container">
+                    <h3 class="progress-title">寻宝进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+            </div>
+
+            <div class="treasure-box-container">
+                <h2 class="treasure-box-title"><i>🎁</i> 宝藏箱</h2>
+                <div class="treasure-box" id="treasureBox"></div>
+                <div class="treasure-content" id="treasureContent">
+                    <h2>✨ 传说中的宝藏 ✨</h2>
+                    <p>无数冒险家梦寐以求的珍宝，蕴含着古老文明的智慧与力量！</p>
+                    <p>月光石在月光下会发出柔和的银光，传说它能实现一个愿望。</p>
+                </div>
+                <button class="btn" id="startBtn">开始寻宝之旅</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>游戏说明</h2>
+            <p>你将踏上一段奇妙的寻宝之旅，解开古老谜题，穿越神秘森林，最终找到传说中的月光石！</p>
+            <p>每个步骤都需要你耐心等待，因为寻宝需要时间与智慧。</p>
+            <ul>
+                <li>点击"开始寻宝之旅"按钮，开启你的冒险</li>
+                <li>每一步都会显示新的线索和进展</li>
+                <li>进度条会随着你的探索而增长</li>
+                <li>最终，你将打开宝藏箱，发现传说中的月光石！</li>
+            </ul>
+        </div>
+
+        <!-- 解谜模态框 -->
+        <div id="riddleModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>神庙守卫的谜题</h2>
+                <p>月光石的'月'指的是什么？</p>
+                <div class="riddle-options">
+                    <button class="riddle-option" data-answer="A">A) 月亮</button>
+                    <button class="riddle-option" data-answer="B">B) 月光</button>
+                    <button class="riddle-option" data-answer="C">C) 月球</button>
+                </div>
+                <div id="riddleResult"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>20234080115李其隆</p>
+        </div>
+    </div>
+
+    <script src="treasure.js"></script>
+</body>
+</html>
