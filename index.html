@@ -1,539 +1,557 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>月光石传说 - 寻宝游戏</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>神秘岛屿寻宝游戏</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-            background-attachment: fixed;
-        }
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#FF7D00',
+            accent: '#7B61FF',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            adventure: ['"Trebuchet MS"', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      .text-shadow-lg {
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+      }
+      .backdrop-blur {
+        backdrop-filter: blur(8px);
+      }
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+      .animate-pulse-slow {
+        animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .animate-treasure {
+        animation: treasure 2s ease-in-out infinite;
+      }
+      .parallax {
+        transform: translateZ(-10px) scale(2);
+      }
+    }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
 
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 1px;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #a8dadc;
-            max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .game-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 900px) {
-            .game-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .steps-container {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .steps-title {
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1.8rem;
-            color: #ff9a9e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .steps-title i {
-            font-size: 2rem;
-        }
-
-        .step {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.4s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .step.active {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .step-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-            margin-bottom: 12px;
-            color: #ff9a9e;
-        }
-
-        .step-content {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-            padding-left: 35px;
-            position: relative;
-        }
-
-        .step-content::before {
-            content: "";
-            position: absolute;
-            left: 10px;
-            top: 0;
-            width: 20px;
-            height: 20px;
-            background: #ff9a9e;
-            border-radius: 50%;
-        }
-
-        .progress-container {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .progress-title {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-            color: #a8dadc;
-        }
-
-        .progress-bar {
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 6px;
-        }
-
-        .progress-text {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #a8dadc;
-        }
-
-        .treasure-box-container {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-
-        .treasure-box-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #ff9a9e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .treasure-box {
-            width: 250px;
-            height: 250px;
-            background: linear-gradient(145deg, #1a2a6c, #2c3e50);
-            border-radius: 50%;
-            margin: 0 auto 25px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .treasure-box.open {
-            transform: scale(1.05);
-            box-shadow: 0 20px 45px rgba(255, 154, 158, 0.6);
-        }
-
-        .treasure-box::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="%23ff9a9e" stroke-width="2" d="M20,20 Q50,5 80,20 T140,20"/></svg>') no-repeat center;
-            opacity: 0.3;
-        }
-
-        .treasure-box::after {
-            content: "";
-            position: absolute;
-            top: 25%;
-            left: 25%;
-            width: 50%;
-            height: 50%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="%23ff9a9e" stroke-width="2" d="M20,20 Q50,5 80,20 T140,20"/></svg>') no-repeat center;
-            opacity: 0.2;
-        }
-
-        .treasure-content {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
-            display: none;
-            transition: all 0.5s ease;
-            min-height: 150px;
-        }
-
-        .treasure-content.show {
-            display: block;
-            animation: fadeIn 0.8s ease;
-        }
-
-        .treasure-content h2 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: #ff9a9e;
-        }
-
-        .treasure-content p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        .btn {
-            display: inline-block;
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
-            color: #2c3e50;
-            border: none;
-            padding: 14px 35px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
-            text-transform: uppercase;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            background: linear-gradient(to right, #ff8a8a, #f9c1c1);
-        }
-
-        .btn:active {
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            background: #a8dadc;
-            color: #2c3e50;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .instructions {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 30px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .instructions h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ff9a9e;
-            font-size: 1.8rem;
-        }
-
-        .instructions p {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #e0e0e0;
-            margin-bottom: 15px;
-        }
-
-        .instructions ul {
-            padding-left: 25px;
-            margin: 15px 0;
-        }
-
-        .instructions li {
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        .instructions li::marker {
-            color: #ff9a9e;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #a8dadc;
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* 解谜模态框 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background-color: #1a2a6c;
-            padding: 30px;
-            border-radius: 15px;
-            width: 80%;
-            max-width: 500px;
-            color: #fff;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 30px;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #ff9a9e;
-            transition: transform 0.2s;
-        }
-
-        .close:hover {
-            transform: rotate(90deg);
-        }
-
-        .riddle-options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        .riddle-option {
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
-            color: #2c3e50;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-        }
-
-        .riddle-option:hover {
-            transform: translateY(-3px);
-            background: linear-gradient(to right, #ff8a8a, #f9c1c1);
-        }
-
-        #riddleResult {
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-top: 20px;
-            height: 25px;
-        }
-
-        /* 动画效果 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 154, 158, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 154, 158, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 154, 158, 0); }
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-            }
-
-            .step-title {
-                font-size: 1.2rem;
-            }
-
-            .treasure-box {
-                width: 200px;
-                height: 200px;
-            }
-        }
-    </style>
+    @keyframes treasure {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1) rotate(5deg); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>月光石传说</h1>
-            <p class="subtitle">踏上寻找传说中的"月光石"的冒险之旅，解开古老谜题，穿越神秘森林，最终揭开宝藏的面纱！</p>
-        </header>
 
-        <div class="game-container">
-            <div class="steps-container">
-                <h2 class="steps-title"><i>🔍</i> 寻宝步骤</h2>
+<body class="font-adventure bg-dark text-light min-h-screen overflow-x-hidden">
+  <!-- 音频元素 - 隐藏在页面中 -->
+  <audio id="mapMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-adventure-game-soundtrack-280.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="forestMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-forest-stream-ambience-1243.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="caveMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-darkness-ambience-682.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="castleMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-medieval-strength-1163.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="beachMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-waves-and-seagulls-ambience-1191.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="templeMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-mystical-forest-ambience-1207.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="islandMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-epic-discovery-221.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="successSound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="clickSound">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+  </audio>
 
-                <div class="step" id="step1">
-                    <div class="step-title"><i>📚</i> 初始线索</div>
-                    <div class="step-content" id="step1-content"></div>
-                </div>
+  <!-- 加载屏幕 -->
+  <div id="loadingScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-dark">
+    <div class="w-24 h-24 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
+    <p class="text-xl text-light animate-pulse">正在准备寻宝之旅...</p>
+  </div>
 
-                <div class="step" id="step2">
-                    <div class="step-title"><i>🧩</i> 解开谜题</div>
-                    <div class="step-content" id="step2-content"></div>
-                </div>
+  <!-- 游戏容器 -->
+  <div id="gameContainer" class="hidden">
+    <!-- 全景地图页面 -->
+    <div id="mapPage" class="relative min-h-screen">
+      <!-- 背景 -->
+      <div class="absolute inset-0 z-0">
+        <img src="https://picsum.photos/id/1015/1920/1080" alt="岛屿全景" class="w-full h-full object-cover opacity-80">
+        <div class="absolute inset-0 bg-gradient-to-b from-dark/40 to-dark/70"></div>
+      </div>
 
-                <div class="step" id="step3">
-                    <div class="step-title"><i>📜</i> 解码古文</div>
-                    <div class="step-content" id="step3-content"></div>
-                </div>
+      <!-- 导航栏 -->
+      <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+        <h1 class="text-2xl md:text-4xl font-bold text-light text-shadow-lg">神秘岛屿寻宝</h1>
+        <div class="flex items-center gap-4">
+          <button id="musicToggle" class="text-light hover:text-primary transition-colors">
+            <i class="fa fa-volume-up text-xl"></i>
+          </button>
+          <button id="inventoryBtn" class="bg-primary/80 hover:bg-primary text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all transform hover:scale-105">
+            <i class="fa fa-chest"></i>
+            <span>宝藏</span>
+            <span id="treasureCount" class="bg-secondary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">0</span>
+          </button>
+        </div>
+      </nav>
 
-                <div class="step" id="step4">
-                    <div class="step-title"><i>🌳</i> 穿越森林</div>
-                    <div class="step-content" id="step4-content"></div>
-                </div>
+      <!-- 地图标题 -->
+      <div class="relative z-10 text-center mt-8 md:mt-16">
+        <h2 class="text-[clamp(1.5rem,5vw,3rem)] font-bold text-light text-shadow-lg mb-4">探索神秘岛屿</h2>
+        <p class="text-light/80 max-w-2xl mx-auto text-lg">点击地图上的标记，探索不同区域，寻找隐藏的宝藏</p>
+      </div>
 
-                <div class="step" id="step5">
-                    <div class="step-title"><i>⛩️</i> 寻找神庙</div>
-                    <div class="step-content" id="step5-content"></div>
-                </div>
+      <!-- 地图标记 -->
+      <div class="relative z-10 w-full h-[50vh] md:h-[60vh] mt-8 px-4">
+        <img src="https://picsum.photos/id/1018/1200/800" alt="岛屿地图" class="w-full h-full object-contain relative">
 
-                <div class="step" id="step6">
-                    <div class="step-title"><i>💎</i> 宝藏开启</div>
-                    <div class="step-content" id="step6-content"></div>
-                </div>
-
-                <div class="progress-container">
-                    <h3 class="progress-title">寻宝进度</h3>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <div class="progress-text" id="progressText">0%</div>
-                </div>
-            </div>
-
-            <div class="treasure-box-container">
-                <h2 class="treasure-box-title"><i>🎁</i> 宝藏箱</h2>
-                <div class="treasure-box" id="treasureBox"></div>
-                <div class="treasure-content" id="treasureContent">
-                    <h2>✨ 传说中的宝藏 ✨</h2>
-                    <p>无数冒险家梦寐以求的珍宝，蕴含着古老文明的智慧与力量！</p>
-                    <p>月光石在月光下会发出柔和的银光，传说它能实现一个愿望。</p>
-                </div>
-                <button class="btn" id="startBtn">开始寻宝之旅</button>
-            </div>
+        <!-- 森林标记 -->
+        <div class="absolute top-[30%] left-[25%] group cursor-pointer" data-location="forest">
+          <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center animate-pulse-slow shadow-lg">
+            <i class="fa fa-tree text-white"></i>
+          </div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark/90 backdrop-blur px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            迷雾森林
+          </div>
         </div>
 
-        <div class="instructions">
-            <h2>游戏说明</h2>
-            <p>你将踏上一段奇妙的寻宝之旅，解开古老谜题，穿越神秘森林，最终找到传说中的月光石！</p>
-            <p>每个步骤都需要你耐心等待，因为寻宝需要时间与智慧。</p>
-            <ul>
-                <li>点击"开始寻宝之旅"按钮，开启你的冒险</li>
-                <li>每一步都会显示新的线索和进展</li>
-                <li>进度条会随着你的探索而增长</li>
-                <li>最终，你将打开宝藏箱，发现传说中的月光石！</li>
-            </ul>
+        <!-- 洞穴标记 -->
+        <div class="absolute top-[60%] left-[45%] group cursor-pointer" data-location="cave">
+          <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center animate-pulse-slow shadow-lg">
+            <i class="fa fa-mountain text-white"></i>
+          </div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark/90 backdrop-blur px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            幽深洞穴
+          </div>
         </div>
 
-        <!-- 解谜模态框 -->
-        <div id="riddleModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>神庙守卫的谜题</h2>
-                <p>月光石的'月'指的是什么？</p>
-                <div class="riddle-options">
-                    <button class="riddle-option" data-answer="A">A) 月亮</button>
-                    <button class="riddle-option" data-answer="B">B) 月光</button>
-                    <button class="riddle-option" data-answer="C">C) 月球</button>
-                </div>
-                <div id="riddleResult"></div>
-            </div>
+        <!-- 古堡标记 -->
+        <div class="absolute top-[20%] left-[65%] group cursor-pointer" data-location="castle">
+          <div class="w-10 h-10 bg-amber-900 rounded-full flex items-center justify-center animate-pulse-slow shadow-lg">
+            <i class="fa fa-university text-white"></i>
+          </div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark/90 backdrop-blur px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            古老城堡
+          </div>
         </div>
 
-        <div class="footer">
-            <p>20234080115李其隆</p>
+        <!-- 海滩标记 -->
+        <div class="absolute top-[80%] left-[70%] group cursor-pointer" data-location="beach">
+          <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-pulse-slow shadow-lg">
+            <i class="fa fa-anchor text-white"></i>
+          </div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark/90 backdrop-blur px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            黄金海滩
+          </div>
         </div>
+
+        <!-- 寺庙标记 -->
+        <div class="absolute top-[40%] left-[80%] group cursor-pointer" data-location="temple">
+          <div class="w-10 h-10 bg-rose-800 rounded-full flex items-center justify-center animate-pulse-slow shadow-lg">
+            <i class="fa fa-archway text-white"></i>
+          </div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark/90 backdrop-blur px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            神秘寺庙
+          </div>
+        </div>
+
+        <!-- 最终岛屿标记 (初始隐藏) -->
+        <div id="finalIslandMarker" class="hidden absolute top-[50%] left-[50%] group cursor-pointer" data-location="island">
+          <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center animate-pulse-slow shadow-lg">
+            <i class="fa fa-star text-white text-xl"></i>
+          </div>
+          <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-dark/90 backdrop-blur px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            最终岛屿
+          </div>
+        </div>
+      </div>
+
+      <!-- 进度显示 -->
+      <div class="relative z-10 max-w-3xl mx-auto mt-8 px-4">
+        <div class="bg-dark/60 backdrop-blur rounded-xl p-4 border border-primary/30">
+          <h3 class="text-xl font-semibold mb-2">探索进度</h3>
+          <div class="w-full bg-gray-700 rounded-full h-4 mb-2">
+            <div id="progressBar" class="bg-primary h-4 rounded-full" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-sm text-light/80">
+            <span>已探索: <span id="exploredCount">0</span>/5 区域</span>
+            <span>已找到: <span id="foundTreasures">0</span>/5 宝藏</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script src="treasure.js"></script>
+    <!-- 各个地点页面 (初始隐藏) -->
+    <div id="locationPages" class="hidden">
+      <!-- 森林页面 -->
+      <div id="forestPage" class="location-page relative min-h-screen">
+        <div class="absolute inset-0 z-0">
+          <img src="https://picsum.photos/id/10/1920/1080" alt="森林" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-b from-dark/30 to-dark/80"></div>
+        </div>
+
+        <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+          <button class="back-btn bg-dark/50 hover:bg-dark/80 text-white p-3 rounded-full transition-all">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="text-2xl md:text-3xl font-bold text-light text-shadow">迷雾森林</h2>
+          <div class="w-10"></div> <!-- 占位，保持布局 -->
+        </nav>
+
+        <div class="relative z-10 max-w-3xl mx-auto p-6">
+          <div class="bg-dark/70 backdrop-blur rounded-xl p-6 border border-green-900/50 mb-6">
+            <p class="text-lg mb-4">你走进了一片茂密的森林，阳光透过树叶的缝隙洒下来。空气中弥漫着潮湿的泥土气息。</p>
+            <p class="text-lg mb-6">据说这里藏着一件古老的神器，但需要解开森林的谜题才能找到它。</p>
+
+            <div id="forestPuzzle" class="puzzle-container">
+              <p class="mb-4">谜题：森林中哪种动物不属于这里？</p>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button class="puzzle-option bg-green-800/30 hover:bg-green-800/60 p-4 rounded-lg transition-all" data-answer="deer">
+                  <i class="fa fa-deer text-2xl mb-2"></i>
+                  <p>鹿</p>
+                </button>
+                <button class="puzzle-option bg-green-800/30 hover:bg-green-800/60 p-4 rounded-lg transition-all" data-answer="fish">
+                  <i class="fa fa-fish text-2xl mb-2"></i>
+                  <p>鱼</p>
+                </button>
+                <button class="puzzle-option bg-green-800/30 hover:bg-green-800/60 p-4 rounded-lg transition-all" data-answer="bird">
+                  <i class="fa fa-dove text-2xl mb-2"></i>
+                  <p>鸟</p>
+                </button>
+                <button class="puzzle-option bg-green-800/30 hover:bg-green-800/60 p-4 rounded-lg transition-all" data-answer="fox">
+                  <i class="fa fa-fox text-2xl mb-2"></i>
+                  <p>狐狸</p>
+                </button>
+              </div>
+            </div>
+
+            <div id="forestTreasure" class="hidden mt-6 text-center">
+              <div class="inline-block animate-treasure">
+                <i class="fa fa-seedling text-5xl text-green-500 mb-4"></i>
+              </div>
+              <h3 class="text-2xl font-bold mb-2">你找到了！</h3>
+              <p class="mb-4">古老的森林之心，蕴含着生命的力量。</p>
+              <button class="collect-btn bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-full transition-all transform hover:scale-105">
+                收集宝藏
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 洞穴页面 -->
+      <div id="cavePage" class="location-page relative min-h-screen hidden">
+        <div class="absolute inset-0 z-0">
+          <img src="https://picsum.photos/id/29/1920/1080" alt="洞穴" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-b from-dark/60 to-dark/90"></div>
+        </div>
+
+        <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+          <button class="back-btn bg-dark/50 hover:bg-dark/80 text-white p-3 rounded-full transition-all">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="text-2xl md:text-3xl font-bold text-light text-shadow">幽深洞穴</h2>
+          <div class="w-10"></div> <!-- 占位 -->
+        </nav>
+
+        <div class="relative z-10 max-w-3xl mx-auto p-6">
+          <div class="bg-dark/70 backdrop-blur rounded-xl p-6 border border-gray-800/50 mb-6">
+            <p class="text-lg mb-4">洞穴内部漆黑一片，只有你的火把照亮了前方的路。岩壁上似乎有一些奇怪的符号。</p>
+            <p class="text-lg mb-6">要找到洞穴中的宝藏，你需要按照正确的顺序触摸这些符号。</p>
+
+            <div id="cavePuzzle" class="puzzle-container">
+              <p class="mb-4">谜题：按照从最小到最大的顺序点击数字符号</p>
+              <div class="flex flex-wrap justify-center gap-4 mb-4" id="caveSymbols">
+                <!-- 数字将通过JS随机生成 -->
+              </div>
+              <p id="caveHint" class="text-sm text-light/70 hidden">提示：尝试从小到大点击数字</p>
+            </div>
+
+            <div id="caveTreasure" class="hidden mt-6 text-center">
+              <div class="inline-block animate-treasure">
+                <i class="fa fa-gem text-5xl text-amber-500 mb-4"></i>
+              </div>
+              <h3 class="text-2xl font-bold mb-2">你找到了！</h3>
+              <p class="mb-4">闪耀的地底宝石，在黑暗中散发着神秘的光芒。</p>
+              <button class="collect-btn bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-full transition-all transform hover:scale-105">
+                收集宝藏
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 古堡页面 -->
+      <div id="castlePage" class="location-page relative min-h-screen hidden">
+        <div class="absolute inset-0 z-0">
+          <img src="https://picsum.photos/id/164/1920/1080" alt="古堡" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-b from-dark/40 to-dark/80"></div>
+        </div>
+
+        <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+          <button class="back-btn bg-dark/50 hover:bg-dark/80 text-white p-3 rounded-full transition-all">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="text-2xl md:text-3xl font-bold text-light text-shadow">古老城堡</h2>
+          <div class="w-10"></div> <!-- 占位 -->
+        </nav>
+
+        <div class="relative z-10 max-w-3xl mx-auto p-6">
+          <div class="bg-dark/70 backdrop-blur rounded-xl p-6 border border-amber-900/50 mb-6">
+            <p class="text-lg mb-4">城堡的大门紧闭，门上有一个复杂的锁。看起来需要正确的密码才能打开。</p>
+            <p class="text-lg mb-6">墙上的壁画可能隐藏着密码的线索。</p>
+
+            <div id="castlePuzzle" class="puzzle-container">
+              <p class="mb-4">谜题：城堡建于哪一年？（四位数）</p>
+              <div class="flex gap-2 justify-center mb-4">
+                <input type="number" min="0" max="9" class="castle-digit w-12 h-12 text-center text-xl bg-dark/50 border border-gray-600 rounded" maxlength="1">
+                <input type="number" min="0" max="9" class="castle-digit w-12 h-12 text-center text-xl bg-dark/50 border border-gray-600 rounded" maxlength="1">
+                <input type="number" min="0" max="9" class="castle-digit w-12 h-12 text-center text-xl bg-dark/50 border border-gray-600 rounded" maxlength="1">
+                <input type="number" min="0" max="9" class="castle-digit w-12 h-12 text-center text-xl bg-dark/50 border border-gray-600 rounded" maxlength="1">
+              </div>
+              <button id="castleSubmit" class="w-full bg-amber-900/70 hover:bg-amber-900 text-white py-2 rounded transition-all">
+                提交密码
+              </button>
+            </div>
+
+            <div id="castleTreasure" class="hidden mt-6 text-center">
+              <div class="inline-block animate-treasure">
+                <i class="fa fa-crown text-5xl text-yellow-500 mb-4"></i>
+              </div>
+              <h3 class="text-2xl font-bold mb-2">你找到了！</h3>
+              <p class="mb-4">国王的金冠，象征着古老的权力与荣耀。</p>
+              <button class="collect-btn bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-full transition-all transform hover:scale-105">
+                收集宝藏
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 海滩页面 -->
+      <div id="beachPage" class="location-page relative min-h-screen hidden">
+        <div class="absolute inset-0 z-0">
+          <img src="https://picsum.photos/id/15/1920/1080" alt="海滩" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-b from-dark/30 to-dark/70"></div>
+        </div>
+
+        <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+          <button class="back-btn bg-dark/50 hover:bg-dark/80 text-white p-3 rounded-full transition-all">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="text-2xl md:text-3xl font-bold text-light text-shadow">黄金海滩</h2>
+          <div class="w-10"></div> <!-- 占位 -->
+        </nav>
+
+        <div class="relative z-10 max-w-3xl mx-auto p-6">
+          <div class="bg-dark/70 backdrop-blur rounded-xl p-6 border border-blue-900/50 mb-6">
+            <p class="text-lg mb-4">金色的沙滩延伸至远方，海浪拍打着岸边。沙滩上散落着一些贝壳。</p>
+            <p class="text-lg mb-6">传说中，最稀有的贝壳里藏着海洋的秘密。</p>
+
+            <div id="beachPuzzle" class="puzzle-container">
+              <p class="mb-4">谜题：找到与众不同的贝壳</p>
+              <div class="grid grid-cols-3 gap-4" id="shellGrid">
+                <!-- 贝壳将通过JS生成 -->
+              </div>
+            </div>
+
+            <div id="beachTreasure" class="hidden mt-6 text-center">
+              <div class="inline-block animate-treasure">
+                <i class="fa fa-water text-5xl text-blue-500 mb-4"></i>
+              </div>
+              <h3 class="text-2xl font-bold mb-2">你找到了！</h3>
+              <p class="mb-4">海洋之心，蕴藏着无尽的海洋能量。</p>
+              <button class="collect-btn bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-full transition-all transform hover:scale-105">
+                收集宝藏
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 寺庙页面 -->
+      <div id="templePage" class="location-page relative min-h-screen hidden">
+        <div class="absolute inset-0 z-0">
+          <img src="https://picsum.photos/id/28/1920/1080" alt="寺庙" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-b from-dark/40 to-dark/80"></div>
+        </div>
+
+        <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+          <button class="back-btn bg-dark/50 hover:bg-dark/80 text-white p-3 rounded-full transition-all">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="text-2xl md:text-3xl font-bold text-light text-shadow">神秘寺庙</h2>
+          <div class="w-10"></div> <!-- 占位 -->
+        </nav>
+
+        <div class="relative z-10 max-w-3xl mx-auto p-6">
+          <div class="bg-dark/70 backdrop-blur rounded-xl p-6 border border-rose-900/50 mb-6">
+            <p class="text-lg mb-4">古老的寺庙中布满了神秘的雕像，墙壁上刻着古老的文字。</p>
+            <p class="text-lg mb-6">要获得寺庙的宝藏，你需要按照正确的顺序激活这些雕像。</p>
+
+            <div id="templePuzzle" class="puzzle-container">
+              <p class="mb-4">谜题：按照1-4的顺序点击雕像</p>
+              <div class="flex justify-center gap-4" id="statues">
+                <!-- 雕像将通过JS生成 -->
+              </div>
+              <p id="templeAttempts" class="text-center mt-2 text-sm text-light/70">尝试次数: 0</p>
+            </div>
+
+            <div id="templeTreasure" class="hidden mt-6 text-center">
+              <div class="inline-block animate-treasure">
+                <i class="fa fa-balance-scale text-5xl text-purple-500 mb-4"></i>
+              </div>
+              <h3 class="text-2xl font-bold mb-2">你找到了！</h3>
+              <p class="mb-4">智慧之眼，能看透世间万物的本质。</p>
+              <button class="collect-btn bg-primary hover:bg-primary/80 text-white px-6 py-3 rounded-full transition-all transform hover:scale-105">
+                收集宝藏
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 最终岛屿页面 -->
+      <div id="islandPage" class="location-page relative min-h-screen hidden">
+        <div class="absolute inset-0 z-0">
+          <img src="https://picsum.photos/id/1036/1920/1080" alt="最终岛屿" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-b from-dark/30 to-dark/80"></div>
+        </div>
+
+        <nav class="relative z-10 flex justify-between items-center p-4 md:p-6">
+          <button class="back-btn bg-dark/50 hover:bg-dark/80 text-white p-3 rounded-full transition-all">
+            <i class="fa fa-arrow-left"></i>
+          </button>
+          <h2 class="text-2xl md:text-3xl font-bold text-light text-shadow">最终岛屿</h2>
+          <div class="w-10"></div> <!-- 占位 -->
+        </nav>
+
+        <div class="relative z-10 max-w-3xl mx-auto p-6 text-center">
+          <div class="bg-dark/70 backdrop-blur rounded-xl p-8 border border-accent/50 mb-6">
+            <div class="inline-block animate-treasure mb-6">
+              <i class="fa fa-chest text-6xl text-accent"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-4">恭喜你！</h2>
+            <p class="text-lg mb-6">你成功收集了所有的宝藏，解开了神秘岛屿的最终秘密！</p>
+
+            <div id="finalTreasure" class="mb-8">
+              <h3 class="text-2xl font-bold mb-4">终极宝藏</h3>
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="bg-dark/50 p-3 rounded-lg">
+                  <i class="fa fa-seedling text-3xl text-green-500 mb-2"></i>
+                  <p>森林之心</p>
+                </div>
+                <div class="bg-dark/50 p-3 rounded-lg">
+                  <i class="fa fa-gem text-3xl text-amber-500 mb-2"></i>
+                  <p>地底宝石</p>
+                </div>
+                <div class="bg-dark/50 p-3 rounded-lg">
+                  <i class="fa fa-crown text-3xl text-yellow-500 mb-2"></i>
+                  <p>国王金冠</p>
+                </div>
+                <div class="bg-dark/50 p-3 rounded-lg">
+                  <i class="fa fa-water text-3xl text-blue-500 mb-2"></i>
+                  <p>海洋之心</p>
+                </div>
+                <div class="bg-dark/50 p-3 rounded-lg">
+                  <i class="fa fa-balance-scale text-3xl text-purple-500 mb-2"></i>
+                  <p>智慧之眼</p>
+                </div>
+              </div>
+            </div>
+
+            <button id="restartGame" class="bg-accent hover:bg-accent/80 text-white px-8 py-3 rounded-full transition-all transform hover:scale-105 text-lg">
+              重新开始冒险
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 宝藏 inventory -->
+    <div id="inventory" class="fixed inset-0 z-40 bg-dark/80 backdrop-blur flex items-center justify-center hidden">
+      <div class="bg-dark border border-primary/50 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">你的宝藏</h2>
+          <button id="closeInventory" class="text-light/70 hover:text-light text-xl">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+
+        <div id="treasureList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 宝藏将通过JS动态添加 -->
+          <div class="treasure-item bg-dark/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4 opacity-50" data-treasure="forest">
+            <i class="fa fa-seedling text-2xl text-green-500"></i>
+            <div>
+              <h3 class="font-bold">森林之心</h3>
+              <p class="text-sm text-light/70">蕴藏生命力量的古老神器</p>
+            </div>
+          </div>
+          <div class="treasure-item bg-dark/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4 opacity-50" data-treasure="cave">
+            <i class="fa fa-gem text-2xl text-amber-500"></i>
+            <div>
+              <h3 class="font-bold">地底宝石</h3>
+              <p class="text-sm text-light/70">在黑暗中发光的神秘宝石</p>
+            </div>
+          </div>
+          <div class="treasure-item bg-dark/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4 opacity-50" data-treasure="castle">
+            <i class="fa fa-crown text-2xl text-yellow-500"></i>
+            <div>
+              <h3 class="font-bold">国王金冠</h3>
+              <p class="text-sm text-light/70">象征权力与荣耀的王冠</p>
+            </div>
+          </div>
+          <div class="treasure-item bg-dark/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4 opacity-50" data-treasure="beach">
+            <i class="fa fa-water text-2xl text-blue-500"></i>
+            <div>
+              <h3 class="font-bold">海洋之心</h3>
+              <p class="text-sm text-light/70">蕴含海洋能量的神秘宝物</p>
+            </div>
+          </div>
+          <div class="treasure-item bg-dark/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4 opacity-50" data-treasure="temple">
+            <i class="fa fa-balance-scale text-2xl text-purple-500"></i>
+            <div>
+              <h3 class="font-bold">智慧之眼</h3>
+              <p class="text-sm text-light/70">能看透万物本质的神器</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="treasure.js"></script>
 </body>
 </html>
